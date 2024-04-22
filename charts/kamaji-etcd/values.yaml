@@ -13,7 +13,7 @@ serviceAccount:
   name: ""
 
 image:
-  # -- Install image from specific repo 
+  # -- Install image from specific repo
   repository: quay.io/coreos/etcd
   # -- Install image with specific tag, overwrite the tag in the chart
   tag: ""
@@ -57,27 +57,27 @@ autoCompactionRetention: 5m
 # -- Number of committed transactions to trigger a snapshot to disk.
 snapshotCount: "10000"
 
-# -- Raise alarms when backend size exceeds the given quota. It will put the cluster into a maintenance mode which only accepts key reads and deletes. 
+# -- Raise alarms when backend size exceeds the given quota. It will put the cluster into a maintenance mode which only accepts key reads and deletes.
 quotaBackendBytes: "8589934592" # 8Gi
 
 persistentVolumeClaim:
-  # -- The size of persistent storage for etcd data 
+  # -- The size of persistent storage for etcd data
   size: 10Gi
   # -- A specific storage class
   storageClassName: ""
   # -- The Access Mode to storage
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   # -- The custom annotations to add to the PVC
   customAnnotations: {}
   #  volumeType: local
 
-# -- Enable storage defragmentation 
+# -- Enable storage defragmentation
 defragmentation:
   # -- The job scheduled maintenance time for defrag (empty to disable)
   schedule: "*/15 * * * *" # https://crontab.guru/
 
-# -- Enable storage backup 
+# -- Enable storage backup
 backup:
   # -- Enable scheduling backup job
   enabled: false
@@ -100,20 +100,22 @@ backup:
     # -- The S3 storage ACCESS KEY credential. The plain value has precedence over the valueFrom that can be used to retrieve the value from a Secret.
     accessKey:
       value: ""
-      valueFrom: {}
+      valueFrom:
+        {}
         # secretKeyRef:
         #   key: access_key
         #   name: minio-key
     # -- The S3 storage SECRET KEY credential. The plain value has precedence over the valueFrom that can be used to retrieve the value from a Secret.
     secretKey:
       value: ""
-      valueFrom: {}
+      valueFrom:
+        {}
         # secretKeyRef:
         #   key: secret_key
         #   name: minio-key
     # -- The S3 client image config section
     image:
-      # -- Install image from specific repo 
+      # -- Install image from specific repo
       repository: minio/mc
       # -- Install image with specific tag
       tag: "RELEASE.2022-11-07T23-47-39Z"
@@ -127,9 +129,20 @@ podLabels:
 # -- Annotations to add to all etcd pods
 podAnnotations: {}
 
+# -- The pod security context to apply to etcd
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: "RuntimeDefault"
+
 # -- The securityContext to apply to etcd
 securityContext:
   allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
 
 # -- The priorityClassName to apply to etcd
 priorityClassName: system-cluster-critical
@@ -166,7 +179,7 @@ serviceMonitor:
   # -- Enable ServiceMonitor for Prometheus
   enabled: false
   # -- Install the ServiceMonitor into a different Namespace, as the monitoring stack one (default: the release one)
-  namespace: ''
+  namespace: ""
   # -- Assign additional labels according to Prometheus' serviceMonitorSelector matching labels
   labels: {}
   # -- Assign additional Annotations
@@ -201,7 +214,7 @@ alerts:
   # -- Enable alerts for Alertmanager
   enabled: false
   # -- Install the Alerts into a different Namespace, as the monitoring stack one (default: the release one)
-  namespace: ''
+  namespace: ""
   # -- Assign additional labels according to Prometheus' Alerts matching labels
   labels: {}
   # -- Assign additional Annotations

@@ -24,6 +24,10 @@ spec:
           - sh
           - -c
           - kubectl --namespace={{ .Release.Namespace }} rollout status sts/{{ include "etcd.stsName" . }} --timeout=300s
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       containers:
         - command:
           - bash
@@ -55,10 +59,17 @@ spec:
               mountPath: /opt/certs/root-certs
             - name: ca
               mountPath: /opt/certs/ca
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: "RuntimeDefault"
       {{- with .Values.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}

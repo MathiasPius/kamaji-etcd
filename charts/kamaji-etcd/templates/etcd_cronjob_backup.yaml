@@ -53,6 +53,10 @@ spec:
               mountPath: /opt/certs/ca
             - name: shared-data
               mountPath: /opt/etcd-dump
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
           containers:
           - name: minio-client
             image: {{ include "minio-client.fullyQualifiedDockerImage" . }}
@@ -94,10 +98,17 @@ spec:
             volumeMounts:
             - name: shared-data
               mountPath: /opt/etcd-dump
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
             fsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: "RuntimeDefault"
           {{- with .Values.tolerations }}
           tolerations: {{- toYaml . | nindent 12 }}
           {{- end }}

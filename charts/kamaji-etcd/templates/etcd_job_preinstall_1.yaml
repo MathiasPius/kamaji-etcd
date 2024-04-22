@@ -33,6 +33,10 @@ spec:
               name: certs
             - mountPath: /csr
               name: csr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       containers:
         - name: kubectl
           image: {{ printf "clastix/kubectl:%s" (include "etcd.jobsTagKubeVersion" .) }}
@@ -54,10 +58,17 @@ spec:
           volumeMounts:
             - mountPath: /certs
               name: certs
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: "RuntimeDefault"
       {{- with .Values.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
